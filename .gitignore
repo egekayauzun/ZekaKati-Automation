@@ -1,3 +1,53 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+.env.local
+
+logs/*.log
+
+assets/output/
+assets/clips/
+assets/uploads/
+assets/audio/
+assets/videos/
+
+.cursor/
+.claude/
+.tools/
+
+.DS_Store
+Thumbs.db
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+.env.local
+
+logs/*.log
+
+assets/output/
+assets/clips/
+assets/uploads/
+assets/audio/
+assets/videos/
+
+.cursor/
+.claude/
+.tools/ffmpeg/
+<<<<<<< HEAD
+
+.DS_Store
+Thumbs.db
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -216,3 +266,30 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+=======
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+.env.local
+
+logs/*.log
+
+assets/output/
+assets/clips/
+assets/uploads/
+assets/audio/
+assets/videos/
+
+.cursor/
+.claude/
+=======
+>>>>>>> 21c9159 (Remove local ffmpeg binaries from repository.)
+
+.DS_Store
+Thumbs.db
+>>>>>>> 2f62f94 (Initial project setup with secure env handling.)

@@ -1,0 +1,9 @@
+anthropic==0.51.0
+python-dotenv
+elevenlabs
+moviepy
+pytrends
+pydantic
+requests
+faster-whisper
+yt-dlp

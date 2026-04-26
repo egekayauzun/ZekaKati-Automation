@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Uretici</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700&family=Roboto:wght@400;700&family=Oswald:wght@400;700&family=Poppins:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0d0f14;
+    --surface:     #151820;
+    --surface-2:   #1c2030;
+    --surface-3:   #242840;
+    --border:      #2a2f45;
+    --border-hi:   #3d4460;
+    --accent:      #6c63ff;
+    --accent-glow: #6c63ff44;
+    --accent-2:    #ff6b9d;
+    --accent-semi: #22d3a0;
+    --green:       #22d3a0;
+    --yellow:      #f5c842;
+    --red:         #ff5c72;
+    --text:        #e8eaf2;
+    --text-muted:  #7880a0;
+    --text-dim:    #4a5070;
+    --radius:      14px;
+    --radius-sm:   8px;
+    --shadow:      0 4px 24px #0008;
+    --transition:  .18s cubic-bezier(.4,0,.2,1);
+    --font:        'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ── Layout Shell ─────────────────────────────────────────────── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 16px 24px 0;
+    gap: 16px;
+  }
+
+  /* ── App Navigation ───────────────────────────────────────────── */
+  .app-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 17px; letter-spacing: -.3px;
+    color: var(--text); text-decoration: none; cursor: default;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg,var(--accent),var(--accent-2));
+    border-radius: 9px;
+    display: grid; place-items: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .nav-tabs {
+    display: flex; gap: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .nav-tab {
+    padding: 7px 18px;
+    border-radius: 7px;
+    font-size: 13px; font-weight: 600;
+    border: none; cursor: pointer;
+    background: transparent; color: var(--text-muted);
+    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-tab:hover:not(.active) { color: var(--text); background: var(--surface-3); }
+  .nav-tab.active {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 2px 14px var(--accent-glow);
+  }
+  .nav-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nav-spacer { flex: 1; }
+  .badge {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--accent-glow); color: var(--accent);
+    border: 1px solid var(--accent)44;
+    letter-spacing: .4px;
+  }
+
+  /* ── Tab Pages ────────────────────────────────────────────────── */
+  .tab-page { display: none; flex: 1; min-height: 0; }
+  .tab-page.active { display: flex; flex-direction: column; }
+
+  /* ── Dashboard ────────────────────────────────────────────────── */
+  .dash-scroll { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+  .dash-welcome {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; padding: 40px 20px 28px; text-align: center;
+  }
+  .dash-welcome-icon { font-size: 54px; line-height: 1; }
+  .dash-title { font-size: 26px; font-weight: 700; color: var(--text); }
+  .dash-subtitle { font-size: 14px; color: var(--text-muted); }
+  .dash-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px; padding: 0 4px;
+  }
+  .dash-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px 24px 20px;
+    cursor: pointer; transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative; overflow: hidden;
+  }
+  .dash-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .28s ease;
+  }
+  .dash-card:hover { border-color: var(--border-hi); transform: translateY(-2px); box-shadow: 0 8px 28px #0009; }
+  .dash-card:hover::after { transform: scaleX(1); }
+  .dash-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .dash-card-icon { font-size: 34px; }
+  .dash-card-title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .dash-card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; flex: 1; }
+  .dash-card-arrow {
+    font-size: 18px; color: var(--accent);
+    align-self: flex-end; margin-top: 4px;
+    transition: transform var(--transition);
+  }
+  .dash-card:hover .dash-card-arrow { transform: translateX(5px); }
+
+  /* ── Main Grid (Otomasyon tab) ────────────────────────────────── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 440px;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 20px;
+  }
+
+  /* ── Card ─────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600; font-size: 14px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .card-header .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-dim);
+  }
+  .card-header .dot.active { background: var(--green); box-shadow: 0 0 8px var(--green)88; }
+  .card-header .dot.busy   { background: var(--yellow); animation: pulse 1.2s infinite; }
+  .card-header .dot.done   { background: var(--accent); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .card-title { color: var(--text); }
+  .card-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .card-body::-webkit-scrollbar { width: 4px; }
+  .card-body::-webkit-scrollbar-track { background: transparent; }
+  .card-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 4px; }
+
+  /* ── Preview Panel ────────────────────────────────────────────── */
+  .preview-wrap { display: flex; flex-direction: column; gap: 0; }
+  .video-stage {
+    flex: 1; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #080a0f; position: relative; overflow: hidden;
+  }
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    color: var(--text-dim); text-align: center; padding: 40px;
+    transition: opacity var(--transition);
+  }
+  .empty-state .big-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 2px dashed var(--border-hi);
+    display: grid; place-items: center;
+    font-size: 28px; color: var(--text-dim);
+    transition: border-color var(--transition), color var(--transition);
+  }
+  .empty-state p { font-size: 13px; max-width: 200px; line-height: 1.5; }
+  .video-player {
+    display: none; width: 100%; height: 100%; object-fit: contain;
+    position: relative; z-index: 4; background: #000;
+  }
+  .subtitle-preview {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: 16%; min-width: 220px; max-width: 88%;
+    text-align: center; font-size: 28px; font-weight: 700;
+    color: #ffffff; text-shadow: 0 2px 6px #000;
+    padding: 8px 14px; border-radius: 10px;
+    background: #00000033; border: 1px solid #ffffff22;
+    pointer-events: none; z-index: 3;
+  }
+  .loading-overlay {
+    display: none; position: absolute; inset: 0;
+    background: #080a0f;
+    flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  }
+  .loading-overlay.visible { display: flex; }
+  .spinner-ring {
+    width: 56px; height: 56px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-label { font-size: 13px; color: var(--text-muted); }
+  .progress-strip {
+    border-top: 1px solid var(--border); padding: 12px 20px;
+    display: flex; align-items: center; gap: 14px;
+    flex-shrink: 0; background: var(--surface);
+  }
+  .progress-info { flex: 1; }
+  .progress-info .step-label {
+    font-size: 12px; color: var(--text-muted); margin-bottom: 6px;
+    display: flex; justify-content: space-between;
+  }
+  .progress-bar-track { height: 4px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    width: 0%; transition: width .4s ease;
+  }
+  .dl-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    background: var(--accent); color: #fff;
+    font-size: 13px; font-weight: 600;
+    border: none; cursor: pointer;
+    transition: opacity var(--transition), transform var(--transition);
+    white-space: nowrap;
+  }
+  .dl-btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
+  .dl-btn:not(:disabled):hover { opacity: .88; transform: translateY(-1px); }
+  .steps-list {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    flex-shrink: 0; background: var(--surface);
+  }
+  .step-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text-dim); transition: color var(--transition);
+  }
+  .step-item.done  { color: var(--green); }
+  .step-item.busy  { color: var(--text-muted); }
+  .step-item .step-icon { font-size: 14px; width: 18px; text-align: center; }
+
+  /* ── Control Panel ────────────────────────────────────────────── */
+  .control-card { gap: 0; }
+  .mode-toggle {
+    display: flex; gap: 4px;
+    background: var(--surface-3); border-radius: var(--radius-sm); padding: 4px;
+    flex-shrink: 0; margin-left: auto;
+  }
+  .mode-btn {
+    padding: 7px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    border: none; cursor: pointer;
+    background: transparent; color: var(--text-muted);
+    transition: background var(--transition), color var(--transition);
+    white-space: nowrap;
+  }
+  .mode-btn.active { background: var(--accent); color: #fff; }
+  .mode-btn.active.semi { background: var(--accent-semi); }
+
+  /* ── Form Elements ────────────────────────────────────────────── */
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .inline-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .mini-btn {
+    border: 1px solid var(--border-hi);
+    background: var(--surface-3); color: var(--text);
+    border-radius: 8px; padding: 8px 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), transform var(--transition);
+  }
+  .mini-btn:hover { border-color: var(--accent); background: var(--accent-glow); transform: translateY(-1px); }
+  .mini-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .field-help { font-size: 11px; color: var(--text-dim); line-height: 1.45; }
+  .field-help strong { color: var(--text-muted); font-weight: 600; }
+  .field-label {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-muted); letter-spacing: .3px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .field-label .optional { font-weight: 400; color: var(--text-dim); font-size: 11px; }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="color"],
+  select,
+  textarea {
+    width: 100%;
+    background: var(--surface-3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--font); font-size: 13px;
+    padding: 10px 12px; outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    resize: none;
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  select { appearance: none; cursor: pointer; }
+  select option { background: var(--surface-2); }
+  textarea { min-height: 120px; line-height: 1.55; }
+
+  /* Field validation */
+  .field-error { font-size: 11px; color: var(--red); display: none; margin-top: 2px; }
+  .field-error.visible { display: block; }
+  .field.has-error > input,
+  .field.has-error > textarea {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(255,92,114,.18);
+  }
+
+  /* Upload Zone */
+  .upload-zone {
+    border: 2px dashed var(--border-hi); border-radius: var(--radius-sm);
+    padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    cursor: pointer; transition: border-color var(--transition), background var(--transition);
+    text-align: center; position: relative;
+  }
+  .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: var(--accent-glow); }
+  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-zone .upload-icon { font-size: 26px; }
+  .upload-zone .upload-text { font-size: 13px; color: var(--text-muted); }
+  .upload-zone .upload-hint { font-size: 11px; color: var(--text-dim); }
+  .upload-zone .file-name { font-size: 12px; font-weight: 600; color: var(--green); display: none; }
+
+  /* Toggle Switch */
+  .switch-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface-3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+  }
+  .switch-label { font-size: 13px; color: var(--text-muted); }
+  .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: var(--surface-2); border: 1px solid var(--border-hi);
+    border-radius: 22px; cursor: pointer; transition: background var(--transition);
+  }
+  .slider::before {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--text-dim);
+    transition: transform var(--transition), background var(--transition);
+  }
+  .switch input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(18px); background: #fff; }
+
+  /* Radio Option Cards */
+  .option-cards { display: flex; flex-direction: column; gap: 8px; }
+  .option-card {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border); cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+  }
+  .option-card:hover { border-color: var(--border-hi); }
+  .option-card.selected { border-color: var(--accent); background: var(--accent-glow); }
+  .option-card input { display: none; }
+  .option-radio {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border-hi); flex-shrink: 0; margin-top: 1px;
+    display: grid; place-items: center; transition: border-color var(--transition);
+  }
+  .option-card.selected .option-radio { border-color: var(--accent); }
+  .option-card.selected .option-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .option-text .option-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .option-text .option-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+  /* Subtitle Style Controls */
+  .subtitle-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .color-row { display: flex; align-items: center; gap: 8px; }
+  .color-swatch {
+    width: 36px; height: 36px; border-radius: 6px;
+    border: 1px solid var(--border-hi); overflow: hidden; cursor: pointer; flex-shrink: 0;
+  }
+  .color-swatch input[type="color"] { padding: 0; width: 44px; height: 44px; margin: -4px; border: none; border-radius: 0; cursor: pointer; }
+
+  /* Generate / Action Buttons */
+  .generate-btn {
+    width: 100%; padding: 13px; border-radius: var(--radius-sm);
+    border: none; cursor: pointer;
+    font-family: var(--font); font-size: 14px; font-weight: 700; letter-spacing: .2px;
+    background: linear-gradient(135deg, var(--accent), #9b59f5);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+    box-shadow: 0 4px 20px var(--accent-glow);
+    margin-top: 4px;
+    text-decoration: none;
+  }
+  .generate-btn.semi { background: linear-gradient(135deg, var(--accent-semi), #1a9e7a); }
+  .generate-btn.danger { background: linear-gradient(135deg, #ff6b9d, #c9184a); box-shadow: 0 4px 20px rgba(255,107,157,.25); }
+  .generate-btn:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 28px var(--accent-glow); }
+  .generate-btn:active { transform: translateY(0); }
+  .generate-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .generate-btn.running { background: var(--surface-3); color: var(--text-muted); box-shadow: none; }
+
+  /* Form Sections */
+  .form-section { display: flex; flex-direction: column; gap: 14px; }
+  .section-divider {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text-dim); font-size: 11px; font-weight: 600; letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Success State */
+  .success-banner {
+    display: none; align-items: center; gap: 12px;
+    background: #22d3a01a; border: 1px solid var(--green)44;
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    font-size: 13px; color: var(--green); margin-bottom: 4px;
+  }
+  .success-banner.visible { display: flex; }
+  .success-banner .icon { font-size: 18px; }
+
+  /* Category Pills */
+  .category-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat-pill {
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px solid var(--border-hi);
+    background: var(--surface-3); color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), color var(--transition);
+  }
+  .cat-pill:hover { border-color: var(--accent); color: var(--text); }
+  .cat-pill.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
+
+  /* Topic List */
+  .topic-list {
+    display: flex; flex-direction: column; gap: 4px;
+    max-height: 160px; overflow-y: auto;
+    background: var(--surface-3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 6px;
+  }
+  .topic-list::-webkit-scrollbar { width: 4px; }
+  .topic-list::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 4px; }
+  .topic-item {
+    padding: 7px 10px; border-radius: 6px;
+    font-size: 12px; color: var(--text-muted);
+    cursor: pointer; transition: background var(--transition), color var(--transition);
+    border: 1px solid transparent;
+  }
+  .topic-item:hover { background: var(--surface-2); color: var(--text); }
+  .topic-item.selected { background: var(--accent-glow); color: var(--accent); border-color: var(--accent)44; }
+
+  /* Duration Picker */
+  .duration-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .dur-btn {
+    padding: 6px 11px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px solid var(--border-hi);
+    background: var(--surface-3); color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), color var(--transition);
+  }
+  .dur-btn:hover { border-color: var(--accent); color: var(--text); }
+  .dur-btn.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
+  .dur-custom { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); }
+  .dur-custom input { width: 52px; padding: 5px 7px; font-size: 12px; text-align: center; }
+
+  /* ── Clip Layout (Video Kesiti tab) ───────────────────────────── */
+  .clip-layout {
+    display: grid;
+    grid-template-columns: 390px 1fr;
+    gap: 20px;
+    flex: 1; min-height: 0;
+    padding-bottom: 20px;
+  }
+  .clip-settings-panel,
+  .clip-preview-panel { min-height: 0; }
+
+  /* Time Input */
+  .time-input {
+    font-family: 'Courier New', Courier, monospace !important;
+    letter-spacing: 4px; font-size: 15px !important;
+    text-align: center;
+  }
+
+  /* Clip Progress */
+  .clip-progress-wrap { display: none; }
+  .clip-progress-wrap.visible { display: block; }
+
+  /* Clip Result */
+  .clip-result {
+    display: none; padding: 14px;
+    background: #22d3a01a; border: 1px solid var(--green)44;
+    border-radius: var(--radius-sm);
+  }
+  .clip-result.visible { display: block; }
+
+  /* Clip Error */
+  .clip-error-wrap {
+    display: none; padding: 14px;
+    background: #ff5c721a; border: 1px solid var(--red)44;
+    border-radius: var(--radius-sm);
+  }
+  .clip-error-wrap.visible { display: block; }
+
+  /* YouTube Preview */
+  .yt-preview-wrap {
+    flex: 1; min-height: 0; position: relative;
+    background: #080a0f; overflow: hidden;
+  }
+  .yt-preview-empty {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 40px; color: var(--text-dim);
+  }
+  .yt-preview-empty .big-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 2px dashed var(--border-hi);
+    display: grid; place-items: center; font-size: 28px;
+  }
+  .yt-preview-empty p { font-size: 13px; text-align: center; max-width: 220px; line-height: 1.5; }
+  .yt-preview-iframe {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+  }
+  .yt-info-bar {
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    background: var(--surface-2); flex-shrink: 0;
+  }
+  .yt-info-bar p { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+  .yt-info-bar code {
+    font-size: 11px; background: var(--surface-3);
+    padding: 2px 5px; border-radius: 4px; color: var(--accent);
+    font-family: monospace;
+  }
+
+  /* ── Responsive ───────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .preview-wrap { min-height: 340px; }
+    .video-stage { min-height: 220px; }
+    .clip-layout { grid-template-columns: 1fr; }
+    .yt-preview-wrap { min-height: 240px; }
+    .app { padding: 12px 14px 0; }
+    .nav-tab { padding: 7px 12px; font-size: 12px; }
+  }
+  @media (max-width: 560px) {
+    .subtitle-controls { grid-template-columns: 1fr; }
+    .mode-btn { padding: 7px 9px; font-size: 11px; }
+    .nav-tabs { gap: 2px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Navigation ──────────────────────────────────────────────── -->
+  <nav class="app-nav">
+    <div class="nav-brand">
+      <div class="logo-icon">🎬</div>
+      <span>Video Üretici</span>
+    </div>
+    <div class="nav-tabs" role="tablist">
+      <button class="nav-tab" data-tab="dashboard"    onclick="switchTab('dashboard')"    role="tab" aria-selected="false">📊 Dashboard</button>
+      <button class="nav-tab active" data-tab="otomasyon"  onclick="switchTab('otomasyon')"  role="tab" aria-selected="true">🤖 Otomasyon</button>
+      <button class="nav-tab" data-tab="video-kesiti" onclick="switchTab('video-kesiti')" role="tab" aria-selected="false">✂️ Video Kesiti</button>
+    </div>
+    <div class="nav-spacer"></div>
+    <span class="badge">BETA</span>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: DASHBOARD                                                -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="tab-dashboard" class="tab-page" role="tabpanel">
+    <div class="dash-scroll">
+      <div class="dash-welcome">
+        <div class="dash-welcome-icon">🎬</div>
+        <h1 class="dash-title">Video Üretici</h1>
+        <p class="dash-subtitle">YouTube Shorts otomasyon ve klip kesim platformu</p>
+      </div>
+      <div class="dash-cards">
+        <div class="dash-card" onclick="switchTab('otomasyon')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')switchTab('otomasyon')">
+          <div class="dash-card-icon">🤖</div>
+          <div class="dash-card-title">Otomasyon</div>
+          <div class="dash-card-desc">AI destekli YouTube Shorts üretin. Otomatik, yarı-otomatik veya manuel modda trend konular, seslendirme ve altyazı dahil eksiksiz video oluşturun.</div>
+          <div class="dash-card-arrow">→</div>
+        </div>
+        <div class="dash-card" onclick="switchTab('video-kesiti')" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter')switchTab('video-kesiti')">
+          <div class="dash-card-icon">✂️</div>
+          <div class="dash-card-title">Video Kesiti Bulma</div>
+          <div class="dash-card-desc">Herhangi bir YouTube videosundan belirli bir zaman aralığını kesin ve indirin. URL, başlangıç/bitiş zamanını girin — hepsi bu kadar.</div>
+          <div class="dash-card-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: OTOMASYON                                                -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="tab-otomasyon" class="tab-page active" role="tabpanel">
+    <main class="main">
+
+      <!-- ── LEFT: Preview Panel ─────────────────────────────────── -->
+      <div class="card preview-wrap">
+        <div class="card-header">
+          <div class="dot" id="statusDot"></div>
+          <span class="card-title">Onizleme</span>
+          <span id="statusLabel" style="font-size:12px;color:var(--text-dim);margin-left:auto"></span>
+        </div>
+
+        <div class="video-stage" id="videoStage">
+          <div class="empty-state" id="emptyState">
+            <div class="big-icon">▶</div>
+            <p>Uretilen videonuz burada gorunecek</p>
+          </div>
+          <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner-ring"></div>
+            <div class="loading-label" id="loadingMsg">Hazirlaniyor…</div>
+          </div>
+          <video class="video-player" id="videoPlayer" controls></video>
+          <div class="subtitle-preview" id="subtitlePreview">ORNEK ALTYAZI</div>
+        </div>
+
+        <div class="steps-list" id="stepsList" style="display:none">
+          <div class="step-item" id="step-script"><span class="step-icon">📝</span> <span class="step-label-text">Senaryo olusturma</span></div>
+          <div class="step-item" id="step-voice"><span class="step-icon">🎙️</span> <span class="step-label-text">Seslendirme</span></div>
+          <div class="step-item" id="step-images"><span class="step-icon">🖼️</span> <span class="step-label-text">Gorsel olusturma</span></div>
+          <div class="step-item" id="step-subtitles"><span class="step-icon">💬</span> <span class="step-label-text">Altyazi isleme</span></div>
+          <div class="step-item" id="step-compose"><span class="step-icon">🎞️</span> <span class="step-label-text">Video birlestirme</span></div>
+        </div>
+
+        <div class="success-banner" id="successBanner">
+          <span class="icon">✅</span>
+          <span>Video hazir! Asagidan indir veya yeniden uret.</span>
+        </div>
+
+        <div class="progress-strip">
+          <div class="progress-info">
+            <div class="step-label">
+              <span id="progressLabel">Bekleniyor…</span>
+              <span id="progressPct">0%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+          </div>
+          <button class="dl-btn" id="dlBtn" disabled>⬇ Indir</button>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: Control Panel ────────────────────────────────── -->
+      <div class="card control-card">
+        <div class="card-header">
+          <div class="dot"></div>
+          <span class="card-title">Kontroller</span>
+          <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="auto"     onclick="setMode('auto')">Otomatik</button>
+            <button class="mode-btn"        data-mode="semiAuto" onclick="setMode('semiAuto')">Yarı Otomatik</button>
+            <button class="mode-btn"        data-mode="manual"   onclick="setMode('manual')">Manuel</button>
+          </div>
+        </div>
+
+        <div class="card-body" id="formBody">
+
+          <!-- ══ AUTO MODE ══════════════════════════════════════════ -->
+          <div id="autoMode" class="form-section">
+
+            <div class="field">
+              <label class="field-label">Ses</label>
+              <select id="autoVoice">
+                <option value="R1iO02imWa46t8ckcxFN" selected>Ses 1</option>
+                <option value="POPWFdpTM8Mn2ZQEagyQ">Ses 2</option>
+                <option value="D11AWvkESE7DJwqIVi7L">Ses 3</option>
+                <option value="kJKMPwrIKzwVkMKOfRtr">Ses 4</option>
+                <option value="A4Y1K1hO4hO9vMdeZIqP">Ses 5</option>
+              </select>
+              <div class="inline-actions">
+                <button class="mini-btn" type="button" onclick="playVoiceSample('auto')">▶ Sesi Dinle</button>
+              </div>
+              <div class="field-help">ElevenLabs <strong>voice_id</strong>. Onizleme icin <code>python preview_api.py</code> calisir olmali.</div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Konu <span class="optional">trend aktifse opsiyonel</span></label>
+              <input type="text" id="autoTopic" placeholder="orn. Saglik ipuclari, Uzay bilgileri, Yemek…">
+            </div>
+
+            <div class="field">
+              <label class="field-label">Video Suresi</label>
+              <div class="duration-row" id="autoDurRow">
+                <button class="dur-btn" data-sec="15"  onclick="selectDuration('auto',15)">15s</button>
+                <button class="dur-btn" data-sec="30"  onclick="selectDuration('auto',30)">30s</button>
+                <button class="dur-btn active" data-sec="45" onclick="selectDuration('auto',45)">45s</button>
+                <button class="dur-btn" data-sec="60"  onclick="selectDuration('auto',60)">60s</button>
+                <button class="dur-btn" data-sec="90"  onclick="selectDuration('auto',90)">90s</button>
+                <div class="dur-custom">
+                  <input type="number" id="autoDurCustom" min="10" max="180" placeholder="s" title="Ozel sure (10-180)" oninput="selectDuration('auto', parseInt(this.value)||null)">
+                  <span>s</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="switch-row">
+              <span class="switch-label">🔥 Trend konulari otomatik kullan</span>
+              <label class="switch">
+                <input type="checkbox" id="trendSwitch" onchange="onTrendSwitchChange()">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div id="trendCategorySection" style="display:none" class="field">
+              <label class="field-label">Trend Kategorisi</label>
+              <div class="category-grid" id="categoryGrid">
+                <button class="cat-pill active" data-cat="gundem"    onclick="selectCategory(this,'gundem')">📰 Gundem</button>
+                <button class="cat-pill"        data-cat="teknoloji" onclick="selectCategory(this,'teknoloji')">💻 Teknoloji</button>
+                <button class="cat-pill"        data-cat="spor"      onclick="selectCategory(this,'spor')">⚽ Spor</button>
+                <button class="cat-pill"        data-cat="saglik"    onclick="selectCategory(this,'saglik')">🏥 Saglik</button>
+                <button class="cat-pill"        data-cat="bilim"     onclick="selectCategory(this,'bilim')">🔬 Bilim</button>
+                <button class="cat-pill"        data-cat="ekonomi"   onclick="selectCategory(this,'ekonomi')">📈 Ekonomi</button>
+              </div>
+            </div>
+
+            <div id="trendSourceSection" style="display:none" class="field">
+              <label class="field-label">Trend Kaynak Onceligi</label>
+              <select id="trendSourcePreference">
+                <option value="reddit_first" selected>Reddit once, olmazsa Google</option>
+                <option value="google_first">Google once, olmazsa Reddit</option>
+                <option value="reddit_only">Sadece Reddit</option>
+                <option value="google_only">Sadece Google Trends</option>
+              </select>
+            </div>
+
+            <div id="trendTopicsSection" style="display:none" class="field">
+              <label class="field-label">Trend Konulari <span class="optional" id="trendTopicsStatus">—</span></label>
+              <div id="trendTopicList" class="topic-list" style="display:none"></div>
+              <div class="inline-actions">
+                <button class="mini-btn" id="fetchTopicsBtn" type="button" onclick="fetchTrendTopics()">🔍 Konulari Getir</button>
+                <button class="mini-btn" id="randomTopicBtn" type="button" onclick="pickRandomTrendTopic()" disabled>🎲 Rastgele Sec</button>
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:6px">
+              <button class="generate-btn" type="button" id="draftBtn"
+                style="background:linear-gradient(135deg,#444 0%,#2a2a2a 100%)"
+                onclick="startDraftScript()">
+                <span>📝</span> 1. Metin Olustur
+              </button>
+              <div class="field-help" style="margin-top:6px">Once konu/trendi sec, metni olustur; metni duzenleyip 2. adimda videoyu uret.</div>
+            </div>
+
+            <div class="field" id="scriptStep" style="display:none;flex-direction:column;gap:8px">
+              <label class="field-label" for="scriptEditor">Seslendirme metni (duzenle)</label>
+              <textarea id="scriptEditor" rows="8" placeholder="Taslak burada belirir. Onaylamadan once duzenleyin…"></textarea>
+            </div>
+
+            <div class="section-divider">Altyazi Stili</div>
+            <div class="subtitle-controls">
+              <div class="field">
+                <label class="field-label">Yazi Tipi</label>
+                <select id="subtitleFont">
+                  <option>Montserrat</option><option>Roboto</option><option>Oswald</option>
+                  <option>Bebas Neue</option><option>Inter</option><option>Poppins</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label">Boyut</label>
+                <select id="subtitleSize">
+                  <option>Kucuk (22px)</option><option selected>Orta (28px)</option>
+                  <option>Buyuk (34px)</option><option>XL (42px)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label">Konum</label>
+                <select id="subtitlePos">
+                  <option>Alt (80%)</option><option>Orta (50%)</option><option>Ust (20%)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label">Renk</label>
+                <div class="color-row">
+                  <div class="color-swatch"><input type="color" id="subtitleColor" value="#ffffff"></div>
+                  <input type="text" id="subtitleColorHex" value="#ffffff" style="font-family:monospace;font-size:12px">
+                </div>
+              </div>
+            </div>
+
+            <button class="generate-btn" id="autoGenBtn" onclick="startGenerate('auto')">
+              <span>✨</span> 2. Videoyu Uret
+            </button>
+          </div>
+
+          <!-- ══ YARI OTOMATIK MODE ══════════════════════════════════ -->
+          <div id="semiAutoMode" class="form-section" style="display:none">
+
+            <div class="field">
+              <label class="field-label">Ses</label>
+              <select id="semiVoice">
+                <option value="R1iO02imWa46t8ckcxFN" selected>Ses 1</option>
+                <option value="POPWFdpTM8Mn2ZQEagyQ">Ses 2</option>
+                <option value="D11AWvkESE7DJwqIVi7L">Ses 3</option>
+                <option value="kJKMPwrIKzwVkMKOfRtr">Ses 4</option>
+                <option value="A4Y1K1hO4hO9vMdeZIqP">Ses 5</option>
+              </select>
+              <div class="inline-actions">
+                <button class="mini-btn" type="button" onclick="playVoiceSample('semi')">▶ Sesi Dinle</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Konu / Baslik <span class="optional">opsiyonel</span></label>
+              <input type="text" id="semiTopic" placeholder="orn. Mars'a yolculuk, Yapay Zeka devri…">
+            </div>
+
+            <div class="field">
+              <label class="field-label">Ana Video <span style="color:var(--red);font-size:11px">*zorunlu</span></label>
+              <div class="upload-zone" id="semiUploadZone">
+                <input type="file" multiple accept="video/mp4,video/*" id="semiVideoFile" onchange="handleSemiFileSelect(this)">
+                <div class="upload-icon" id="semiUploadIcon">📁</div>
+                <div class="upload-text" id="semiUploadText">Videolari buraya birak veya secmek icin tikla</div>
+                <div class="upload-hint" id="semiUploadHint">MP4, MOV, WebM · max 600 MB</div>
+                <div class="file-name" id="semiFileName"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Seslendirme Metni <span style="color:var(--red);font-size:11px">*zorunlu</span></label>
+              <textarea id="semiVoiceoverText" rows="5" placeholder="Videoda seslendirilecek tam metin. Bu metin video suresini belirler."></textarea>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Sahne Listesi <span class="optional">opsiyonel</span></label>
+              <textarea id="semiScenes" rows="4"
+                placeholder="Her satira bir sahne aciklamasi yazin:&#10;Sahne 1: Tanıtım sahnesi&#10;Sahne 2: Ana içerik&#10;Sahne 3: Kapanış&#10;&#10;Boş bırakılırsa tüm ses için tek sahne kullanılır."></textarea>
+              <div class="field-help">
+                Her satır = 1 sahne. Sesle eşit bölünür. Ses süresi sahne süresini aşarsa <strong>otomatik stok klip eklenir</strong>.<br>
+                Gelişmiş: JSON array da kabul edilir: <code>[{"caption":"...","image_prompt":"...","end_second":10}]</code>
+              </div>
+            </div>
+
+            <button class="generate-btn semi" id="semiGenBtn" onclick="startSemiAutoGenerate()">
+              <span>🎬</span> Videoyu Uret
+            </button>
+          </div>
+
+          <!-- ══ MANUAL MODE ════════════════════════════════════════ -->
+          <div id="manualMode" class="form-section" style="display:none">
+
+            <div class="field">
+              <label class="field-label">Ses</label>
+              <select id="manualVoice">
+                <option value="R1iO02imWa46t8ckcxFN" selected>Ses 1</option>
+                <option value="POPWFdpTM8Mn2ZQEagyQ">Ses 2</option>
+                <option value="D11AWvkESE7DJwqIVi7L">Ses 3</option>
+                <option value="kJKMPwrIKzwVkMKOfRtr">Ses 4</option>
+                <option value="A4Y1K1hO4hO9vMdeZIqP">Ses 5</option>
+              </select>
+              <div class="inline-actions">
+                <button class="mini-btn" type="button" onclick="playVoiceSample('manual')">▶ Sesi Dinle</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Konu <span class="optional">opsiyonel</span></label>
+              <input type="text" id="manualTopic" placeholder="orn. Neden rüya görürüz…">
+            </div>
+
+            <div class="field">
+              <label class="field-label">Video Yukle</label>
+              <div class="upload-zone" id="uploadZone">
+                <input type="file" multiple accept="video/mp4,video/*" id="videoFile" onchange="handleFileSelect(this)">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Videolari buraya birak veya secmek icin tikla</div>
+                <div class="upload-hint">MP4, MOV, WebM · max 2 GB</div>
+                <div class="file-name" id="fileName"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Senin Metnin <span class="optional">opsiyonel</span></label>
+              <textarea id="narrationText" placeholder="Seslendirme metnini buraya yaz. Bos birakirsan videona gore otomatik uretilir…" rows="5"></textarea>
+            </div>
+
+            <div class="section-divider">Uretim Modu</div>
+            <div class="option-cards">
+              <label class="option-card selected" id="optCard1" onclick="selectOpt(this,'opt1')">
+                <input type="radio" name="genOpt" value="auto-video" checked>
+                <div class="option-radio"></div>
+                <div class="option-text">
+                  <div class="option-title">Videodan otomatik</div>
+                  <div class="option-desc">Icerigi analiz et, sonra senaryo, ses ve altyaziyi otomatik uret</div>
+                </div>
+              </label>
+              <label class="option-card" id="optCard2" onclick="selectOpt(this,'opt2')">
+                <input type="radio" name="genOpt" value="use-paragraph">
+                <div class="option-radio"></div>
+                <div class="option-text">
+                  <div class="option-title">Metnimi kullan</div>
+                  <div class="option-desc">Yukaridaki metni seslendirme ve altyazi olusturmada kullan</div>
+                </div>
+              </label>
+              <label class="option-card" id="optCard3" onclick="selectOpt(this,'opt3')">
+                <input type="radio" name="genOpt" value="subtitle-from-video-audio">
+                <div class="option-radio"></div>
+                <div class="option-text">
+                  <div class="option-title">Videonun sesiyle altyazi</div>
+                  <div class="option-desc">Yuklenen videonun kendi sesini cozumleyip altyaziyi otomatik olusturur</div>
+                </div>
+              </label>
+            </div>
+
+            <button class="generate-btn" id="manualGenBtn" onclick="startGenerate('manual')">
+              <span>✨</span> Video Uret
+            </button>
+          </div>
+
+          <div class="section-divider" style="margin-top:10px">Hizli Yeniden Seslendirme</div>
+          <div class="form-section">
+            <div class="field">
+              <label class="field-label">Yeni Seslendirme Metni</label>
+              <textarea id="revoiceText" rows="4" placeholder="Final videonun uzerine hizlica yeni seslendirme metni uygula..."></textarea>
+              <div class="field-help">Bu islem mevcut final videoyu goruntu kaynagi olarak kullanir; stok video adimi tekrar calismaz.</div>
+            </div>
+            <div class="subtitle-controls">
+              <div class="field">
+                <label class="field-label">Stability <span id="stabilityVal">0.36</span></label>
+                <input type="range" id="ttsStability" min="0" max="1" step="0.01" value="0.36">
+              </div>
+              <div class="field">
+                <label class="field-label">Similarity <span id="similarityVal">0.85</span></label>
+                <input type="range" id="ttsSimilarity" min="0" max="1" step="0.01" value="0.85">
+              </div>
+              <div class="field">
+                <label class="field-label">Speed <span id="speedVal">0.95</span></label>
+                <input type="range" id="ttsSpeed" min="0.70" max="1.30" step="0.01" value="0.95">
+              </div>
+              <div class="field">
+                <label class="field-label">Voice Volume <span id="voiceVolumeVal">1.30</span></label>
+                <input type="range" id="voiceVolume" min="0" max="2" step="0.05" value="1.30">
+              </div>
+            </div>
+            <div class="switch-row">
+              <span class="switch-label">Revoice'ta altyaziyi da yenile (yavas)</span>
+              <label class="switch">
+                <input type="checkbox" id="revoiceRefreshSubtitles">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <button class="generate-btn" id="revoiceBtn" onclick="startRevoice()">
+              <span>🔁</span> Hizli Yeniden Seslendir
+            </button>
+          </div>
+
+        </div><!-- /card-body -->
+      </div><!-- /control-card -->
+
+    </main>
+  </div><!-- /tab-otomasyon -->
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: VIDEO KESİTİ BULMA                                       -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="tab-video-kesiti" class="tab-page" role="tabpanel">
+    <div class="clip-layout">
+
+      <!-- ── Left Panel: Settings ─────────────────────────────────── -->
+      <div class="card clip-settings-panel">
+        <div class="card-header">
+          <div class="dot active"></div>
+          <span class="card-title">Klip Ayarları</span>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- YouTube URL -->
+          <div class="field" id="clipUrlField">
+            <label class="field-label" for="clipUrl">YouTube URL <span style="color:var(--red);font-size:11px">*zorunlu</span></label>
+            <input type="text" id="clipUrl"
+              placeholder="https://www.youtube.com/watch?v=..."
+              aria-label="YouTube video URL"
+              oninput="onClipUrlChange(this.value)">
+            <div class="field-error" id="clipUrlError">Geçerli bir YouTube URL girin</div>
+          </div>
+
+          <!-- Start Time -->
+          <div class="field" id="clipStartField">
+            <label class="field-label" for="clipStart">Başlangıç Zamanı</label>
+            <input type="text" id="clipStart"
+              class="time-input" placeholder="00:00:00" maxlength="8"
+              aria-label="Başlangıç zamanı HH:MM:SS formatında"
+              oninput="maskTimeInput(this)">
+            <div class="field-error" id="clipStartError"></div>
+            <div class="field-help">Örnek: <code style="font-size:11px;background:var(--surface-3);padding:1px 5px;border-radius:3px;color:var(--accent)">00:01:30</code> = 1 dakika 30 saniye</div>
+          </div>
+
+          <!-- End Time -->
+          <div class="field" id="clipEndField">
+            <label class="field-label" for="clipEnd">Bitiş Zamanı</label>
+            <input type="text" id="clipEnd"
+              class="time-input" placeholder="00:00:00" maxlength="8"
+              aria-label="Bitiş zamanı HH:MM:SS formatında"
+              oninput="maskTimeInput(this)">
+            <div class="field-error" id="clipEndError"></div>
+          </div>
+
+          <!-- Output Filename -->
+          <div class="field">
+            <label class="field-label" for="clipFilename">
+              Çıktı Dosya Adı
+              <span class="optional">opsiyonel</span>
+            </label>
+            <input type="text" id="clipFilename"
+              placeholder="orn. highlights_final"
+              aria-label="Çıktı dosya adı (uzantısız)">
+            <div class="field-help">.mp4 uzantısı otomatik eklenir.</div>
+          </div>
+
+          <!-- Submit Button -->
+          <button class="generate-btn danger" id="clipSubmitBtn" type="button"
+            onclick="submitClipJob()"
+            aria-label="Klibi kes ve indir">
+            ✂️ Klibi Kes ve İndir
+          </button>
+
+          <!-- Progress Bar -->
+          <div class="clip-progress-wrap" id="clipProgressWrap">
+            <div class="progress-info">
+              <div class="step-label">
+                <span id="clipProgressLabel">İşleniyor…</span>
+                <span id="clipProgressPct">0%</span>
+              </div>
+              <div class="progress-bar-track" style="height:6px;margin-top:6px">
+                <div class="progress-bar-fill" id="clipProgressFill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success: Download link -->
+          <div class="clip-result" id="clipResult" aria-live="polite">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <span style="font-size:20px">✅</span>
+              <span style="font-weight:700;color:var(--green)">Klip hazır!</span>
+            </div>
+            <a id="clipDownloadLink" href="#"
+              class="generate-btn"
+              style="text-decoration:none;background:linear-gradient(135deg,var(--green),#1a9e7a);box-shadow:0 4px 20px rgba(34,211,160,.25)"
+              download>
+              ⬇️ Klibi İndir
+            </a>
+          </div>
+
+          <!-- Error state -->
+          <div class="clip-error-wrap" id="clipError" aria-live="assertive">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <span style="font-size:18px;flex-shrink:0;margin-top:1px">❌</span>
+              <div>
+                <div style="font-weight:700;color:var(--red);margin-bottom:6px">İşlem başarısız</div>
+                <div id="clipErrorMsg" style="font-size:12px;color:var(--text-muted);line-height:1.55;word-break:break-word"></div>
+                <button class="mini-btn" style="margin-top:10px"
+                  onclick="resetClipUI()">↩ Tekrar Dene</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /card-body -->
+      </div><!-- /clip-settings-panel -->
+
+      <!-- ── Right Panel: YouTube Preview ─────────────────────────── -->
+      <div class="card clip-preview-panel" style="overflow:hidden">
+        <div class="card-header">
+          <div class="dot" id="ytPreviewDot"></div>
+          <span class="card-title">YouTube Önizleme</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+          <div class="yt-preview-wrap">
+            <div id="ytPreviewEmpty" class="yt-preview-empty">
+              <div class="big-icon">▶</div>
+              <p>Geçerli bir YouTube URL girin, video önizlemesi burada görünecek</p>
+            </div>
+            <iframe
+              id="ytPreviewIframe"
+              class="yt-preview-iframe"
+              style="display:none"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              title="YouTube Video Önizleme"
+            ></iframe>
+          </div>
+          <div class="yt-info-bar">
+            <p><strong>İpucu:</strong> Videoyu oynatıp zamanlama çubuğunu kullanarak başlangıç ve bitiş zamanlarını tespit edin. Zamanlar <code>HH:MM:SS</code> formatında (ör. <code>00:01:30</code>) girilmeli. İndirilen klip <code>assets/clips/</code> klasörüne kaydedilir.</p>
+          </div>
+        </div>
+      </div><!-- /clip-preview-panel -->
+
+    </div><!-- /clip-layout -->
+  </div><!-- /tab-video-kesiti -->
+
+</div><!-- /app -->
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════════ */
+const API_CANDIDATES = (() => {
+  const list = [];
+  const host = window.location.hostname;
+  if (host) list.push(`http://${host}:8001`);
+  list.push("http://127.0.0.1:8001", "http://localhost:8001");
+  return [...new Set(list)];
+})();
+let API_BASE = API_CANDIDATES[0];
+
+async function apiFetch(path, options = {}) {
+  const candidates = [API_BASE, ...API_CANDIDATES.filter(base => base !== API_BASE)];
+  for (const base of candidates) {
+    try {
+      const response = await fetch(`${base}${path}`, options);
+      API_BASE = base;
+      return response;
+    } catch (err) {
+      // Sonraki aday adrese gec.
+    }
+  }
+  throw new Error(
+    `API baglantisi kurulamadi. Lutfen 'python preview_api.py' komutunun calistigini kontrol edin. Denenen adresler: ${API_CANDIDATES.join(", ")}`
+  );
+}
+let currentMode = 'auto';
+let pendingScript = null;
+let draftTopic = null;
+let draftRunning = false;
+let running = false;
+
+let selectedCategory = 'gundem';
+let autoDurationSeconds = 45;
+let fetchedTopics = [];
+let selectedTrendTopic = null;
+
+let semiUploadedFileId = null;
+let semiUploadedFileIds = [];
+let manualUploadedFileIds = [];
+
+const VOICE_SAMPLES = {
+  "R1iO02imWa46t8ckcxFN": "Birinci ses, kisa bir ornek cumle.",
+  "POPWFdpTM8Mn2ZQEagyQ": "Ikinci ses, kisa bir ornek cumle.",
+  "D11AWvkESE7DJwqIVi7L": "Ucuncu ses, kisa bir ornek cumle.",
+  "kJKMPwrIKzwVkMKOfRtr": "Dorduncu ses, kisa bir ornek cumle.",
+  "A4Y1K1hO4hO9vMdeZIqP": "Besinci ses, kisa bir ornek cumle."
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  const nextPage = document.getElementById('tab-' + tab);
+  if (!nextPage) return;
+  const currentPage = document.querySelector('.tab-page.active');
+  if (currentPage === nextPage) return;
+
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    const isActive = t.dataset.tab === tab;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', String(isActive));
+  });
+
+  if (window.gsap && currentPage) {
+    gsap.to(currentPage, {
+      opacity: 0, y: -8, duration: 0.14, ease: 'power2.in',
+      onComplete: () => {
+        currentPage.classList.remove('active');
+        nextPage.classList.add('active');
+        gsap.fromTo(nextPage,
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }
+        );
+      }
+    });
+  } else {
+    if (currentPage) currentPage.classList.remove('active');
+    nextPage.classList.add('active');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MODE SWITCHING (Otomasyon)
+══════════════════════════════════════════════════════════════════ */
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('autoMode').style.display     = mode === 'auto'     ? 'flex' : 'none';
+  document.getElementById('semiAutoMode').style.display = mode === 'semiAuto' ? 'flex' : 'none';
+  document.getElementById('manualMode').style.display   = mode === 'manual'   ? 'flex' : 'none';
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+    b.classList.toggle('semi', b.dataset.mode === mode && mode === 'semiAuto');
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DURATION PICKER
+══════════════════════════════════════════════════════════════════ */
+function selectDuration(prefix, sec) {
+  autoDurationSeconds = (sec && sec >= 10 && sec <= 180) ? sec : 45;
+  const row = document.getElementById(prefix + 'DurRow');
+  if (!row) return;
+  row.querySelectorAll('.dur-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.sec) === autoDurationSeconds);
+  });
+  const custom = document.getElementById(prefix + 'DurCustom');
+  if (custom && [15, 30, 45, 60, 90].includes(autoDurationSeconds)) custom.value = '';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TREND CATEGORY
+══════════════════════════════════════════════════════════════════ */
+function onTrendSwitchChange() {
+  const on = document.getElementById('trendSwitch').checked;
+  document.getElementById('trendCategorySection').style.display = on ? 'block' : 'none';
+  document.getElementById('trendSourceSection').style.display = on ? 'block' : 'none';
+  document.getElementById('trendTopicsSection').style.display = on ? 'block' : 'none';
+  if (!on) {
+    fetchedTopics = []; selectedTrendTopic = null;
+    document.getElementById('trendTopicList').style.display = 'none';
+    document.getElementById('trendTopicsStatus').textContent = '—';
+  }
+}
+
+function selectCategory(el, cat) {
+  selectedCategory = cat;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  fetchedTopics = []; selectedTrendTopic = null;
+  document.getElementById('trendTopicList').style.display = 'none';
+  document.getElementById('trendTopicsStatus').textContent = '—';
+  document.getElementById('randomTopicBtn').disabled = true;
+}
+
+async function fetchTrendTopics() {
+  const btn = document.getElementById('fetchTopicsBtn');
+  btn.disabled = true;
+  const oldHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner-ring" style="width:12px;height:12px;border-width:2px;display:inline-block"></span> Getiriliyor…';
+  document.getElementById('trendTopicsStatus').textContent = 'Yükleniyor…';
+  document.getElementById('trendTopicList').style.display = 'none';
+  const trend_source_preference = document.getElementById('trendSourcePreference')?.value || 'reddit_first';
+  try {
+    const res = await apiFetch('/api/trends', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: selectedCategory, trend_source_preference, limit: 8 }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'API hatası');
+    fetchedTopics = data.topics || [];
+    if (!fetchedTopics.length) { document.getElementById('trendTopicsStatus').textContent = 'Konu bulunamadi'; return; }
+    document.getElementById('trendTopicsStatus').textContent = `${fetchedTopics.length} konu bulundu`;
+    const list = document.getElementById('trendTopicList');
+    list.innerHTML = '';
+    fetchedTopics.forEach(topic => {
+      const item = document.createElement('div');
+      item.className = 'topic-item'; item.textContent = topic; item.title = topic;
+      item.onclick = () => {
+        list.querySelectorAll('.topic-item').forEach(el => el.classList.remove('selected'));
+        item.classList.add('selected');
+        selectedTrendTopic = topic;
+        document.getElementById('autoTopic').value = topic;
+      };
+      list.appendChild(item);
+    });
+    list.style.display = 'flex';
+    document.getElementById('randomTopicBtn').disabled = false;
+  } catch (e) {
+    document.getElementById('trendTopicsStatus').textContent = 'Hata: ' + e.message;
+    alert('Trend konuları alınamadı: ' + e.message + '\nReddit veya ağ bağlantısını kontrol edin.');
+  } finally {
+    btn.disabled = false; btn.innerHTML = oldHtml;
+  }
+}
+
+function pickRandomTrendTopic() {
+  if (!fetchedTopics.length) return;
+  const idx = Math.floor(Math.random() * fetchedTopics.length);
+  selectedTrendTopic = fetchedTopics[idx];
+  document.getElementById('autoTopic').value = selectedTrendTopic;
+  const list = document.getElementById('trendTopicList');
+  list.querySelectorAll('.topic-item').forEach((el, i) => el.classList.toggle('selected', i === idx));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VOICE HELPERS
+══════════════════════════════════════════════════════════════════ */
+function getVoiceSelect(mode) {
+  if (mode === 'manual') return document.getElementById('manualVoice');
+  if (mode === 'semi')   return document.getElementById('semiVoice');
+  return document.getElementById('autoVoice');
+}
+
+function collectTtsSettings() {
+  return {
+    stability: parseFloat(document.getElementById('ttsStability')?.value || '0.36'),
+    similarity_boost: parseFloat(document.getElementById('ttsSimilarity')?.value || '0.85'),
+    speed: parseFloat(document.getElementById('ttsSpeed')?.value || '0.95'),
+    voice_volume: parseFloat(document.getElementById('voiceVolume')?.value || '1.30'),
+  };
+}
+
+async function playVoiceSample(mode) {
+  const selector = getVoiceSelect(mode);
+  if (!selector) return;
+  const voiceId = selector.value;
+  const sampleText = VOICE_SAMPLES[voiceId] || "Merhaba, bu secili ses icin bir onizlemedir.";
+  try {
+    const tts = collectTtsSettings();
+    const response = await apiFetch('/api/voice-preview', {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ voice_id: voiceId, text: sampleText, ...tts }),
+    });
+    if (!response.ok) throw new Error("Ses onizleme API hatasi");
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+    audio.onended = () => URL.revokeObjectURL(audioUrl);
+  } catch (e) {
+    alert("Ses onizlemesi icin preview API calismiyor olabilir. `python preview_api.py` ile baslat.");
+  }
+}
+
+function addCustomVoice() {
+  const customName = prompt("Yeni ses adi gir (ornek: Mentor Erkek):");
+  if (!customName) return;
+  const customId = prompt("Bu sesin ElevenLabs voice_id degerini gir:");
+  if (!customId) return;
+  const cleanedId = customId.trim();
+  ['autoVoice', 'semiVoice', 'manualVoice'].forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    if (![...select.options].some(o => o.value === cleanedId)) {
+      const option = document.createElement('option');
+      option.value = cleanedId;
+      option.textContent = `${customName} – Ozel Ses`;
+      select.appendChild(option);
+    }
+    select.value = cleanedId;
+  });
+  VOICE_SAMPLES[cleanedId] = `${customName} sesi secildi. Bu, kisa bir tanitim ornegidir.`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RADIO OPTION CARDS
+══════════════════════════════════════════════════════════════════ */
+function selectOpt(card, id) {
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  card.querySelector('input[type=radio]').checked = true;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FILE UPLOAD (Manual)
+══════════════════════════════════════════════════════════════════ */
+function handleFileSelect(input) {
+  const files = Array.from(input.files || []);
+  const zone = document.getElementById('uploadZone');
+  const name = document.getElementById('fileName');
+  if (files.length) {
+    name.textContent = files.length === 1 ? `📎 ${files[0].name}` : `📎 ${files.length} video secildi`;
+    name.style.display = 'block';
+    zone.querySelector('.upload-text').style.display = 'none';
+    zone.querySelector('.upload-hint').style.display = 'none';
+    zone.querySelector('.upload-icon').style.display = 'none';
+    manualUploadedFileIds = [];
+  }
+}
+
+const uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dragover'); });
+uz.addEventListener('dragleave', () => uz.classList.remove('dragover'));
+uz.addEventListener('drop', e => {
+  e.preventDefault(); uz.classList.remove('dragover');
+  const dt = new DataTransfer();
+  Array.from(e.dataTransfer.files || []).forEach(f => dt.items.add(f));
+  const fi = document.getElementById('videoFile');
+  fi.files = dt.files; handleFileSelect(fi);
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   FILE UPLOAD (Semi-Auto)
+══════════════════════════════════════════════════════════════════ */
+function handleSemiFileSelect(input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const fnEl = document.getElementById('semiFileName');
+  fnEl.textContent = files.length === 1 ? `📎 ${files[0].name}` : `📎 ${files.length} video secildi`;
+  fnEl.style.display = 'block';
+  document.getElementById('semiUploadText').style.display = 'none';
+  document.getElementById('semiUploadHint').style.display = 'none';
+  document.getElementById('semiUploadIcon').style.display = 'none';
+  semiUploadedFileId = null; semiUploadedFileIds = [];
+}
+
+const suz = document.getElementById('semiUploadZone');
+suz.addEventListener('dragover', e => { e.preventDefault(); suz.classList.add('dragover'); });
+suz.addEventListener('dragleave', () => suz.classList.remove('dragover'));
+suz.addEventListener('drop', e => {
+  e.preventDefault(); suz.classList.remove('dragover');
+  const dt = new DataTransfer();
+  const files = Array.from(e.dataTransfer.files || []);
+  if (!files.length) return;
+  files.forEach(f => dt.items.add(f));
+  const fi = document.getElementById('semiVideoFile');
+  fi.files = dt.files; handleSemiFileSelect(fi);
+});
+
+async function uploadVideos(inputId) {
+  const input = document.getElementById(inputId);
+  const files = Array.from(input.files || []);
+  if (!files.length) throw new Error("Video dosyası seçilmedi.");
+  const form = new FormData();
+  files.forEach(file => form.append('file', file, file.name));
+  const res = await apiFetch('/api/upload', { method: 'POST', body: form });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || `Yükleme hatası HTTP ${res.status}`);
+  const items = (data.files || []).map(x => x.file_id).filter(Boolean);
+  if (!items.length && data.file_id) return [data.file_id];
+  return items;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   COLOR PICKER SYNC
+══════════════════════════════════════════════════════════════════ */
+document.getElementById('subtitleColor').addEventListener('input', e => {
+  document.getElementById('subtitleColorHex').value = e.target.value;
+  updateSubtitlePreview();
+});
+document.getElementById('subtitleColorHex').addEventListener('input', e => {
+  if (/^#[0-9a-f]{6}$/i.test(e.target.value)) {
+    document.getElementById('subtitleColor').value = e.target.value;
+    updateSubtitlePreview();
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   SUBTITLE PREVIEW
+══════════════════════════════════════════════════════════════════ */
+function parseFontSize(value) {
+  const m = value.match(/\((\d+)px\)/i);
+  return m ? `${m[1]}px` : '28px';
+}
+function parsePosition(value) {
+  if (value.startsWith('Ust')) return '70%';
+  if (value.startsWith('Orta')) return '48%';
+  return '16%';
+}
+function updateSubtitlePreview() {
+  const preview = document.getElementById('subtitlePreview');
+  preview.style.fontFamily = `'${document.getElementById('subtitleFont').value}', Inter, sans-serif`;
+  preview.style.fontSize   = parseFontSize(document.getElementById('subtitleSize').value);
+  preview.style.color      = document.getElementById('subtitleColor').value;
+  preview.style.bottom     = parsePosition(document.getElementById('subtitlePos').value);
+}
+['subtitleFont', 'subtitleSize', 'subtitlePos'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updateSubtitlePreview);
+});
+updateSubtitlePreview();
+
+function bindTtsSlider(id, outId, format = (v) => Number(v).toFixed(2)) {
+  const input = document.getElementById(id);
+  const out = document.getElementById(outId);
+  if (!input || !out) return;
+  const sync = () => { out.textContent = format(input.value); };
+  input.addEventListener('input', sync); sync();
+}
+bindTtsSlider('ttsStability', 'stabilityVal');
+bindTtsSlider('ttsSimilarity', 'similarityVal');
+bindTtsSlider('ttsSpeed', 'speedVal');
+bindTtsSlider('voiceVolume', 'voiceVolumeVal');
+
+/* ══════════════════════════════════════════════════════════════════
+   DRAFT SCRIPT
+══════════════════════════════════════════════════════════════════ */
+async function startDraftScript() {
+  if (draftRunning) return;
+  const btn = document.getElementById("draftBtn");
+  if (!btn) return;
+  draftRunning = true; btn.disabled = true;
+  const oldHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;border-width:2px;display:inline-block"></span> Hazirlaniyor…';
+  try {
+    const topic = document.getElementById("autoTopic").value.trim() || null;
+    const use_trends = document.getElementById("trendSwitch").checked;
+    const trend_category = use_trends ? selectedCategory : null;
+    const trend_source_preference = use_trends ? (document.getElementById("trendSourcePreference")?.value || "reddit_first") : "reddit_first";
+    const response = await apiFetch('/api/draft', {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, use_trends, trend_category, trend_source_preference, duration_seconds: autoDurationSeconds }),
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error((data && data.error) || `HTTP ${response.status}`);
+    pendingScript = data.script; draftTopic = data.topic;
+    const editor = document.getElementById("scriptEditor");
+    const step = document.getElementById("scriptStep");
+    if (editor) editor.value = (pendingScript && pendingScript.voiceover_text) || "";
+    if (step) { step.style.display = "flex"; step.style.flexDirection = "column"; }
+  } catch (e) {
+    alert(`Metin olusturulamadi: ${e.message}`);
+  } finally {
+    draftRunning = false; btn.disabled = false; btn.innerHTML = oldHtml;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PAYLOAD BUILDERS
+══════════════════════════════════════════════════════════════════ */
+function collectGeneratePayload(mode) {
+  const tts = collectTtsSettings();
+  if (mode === "manual") {
+    const selectedOption = (document.querySelector('input[name="genOpt"]:checked') || {}).value || 'auto-video';
+    return {
+      topic: document.getElementById("manualTopic").value.trim() || null,
+      voice_id: document.getElementById("manualVoice").value,
+      use_trends: false,
+      uploaded_file_ids: manualUploadedFileIds,
+      use_video_audio_subtitles: selectedOption === "subtitle-from-video-audio",
+      ...tts,
+    };
+  }
+  const useTrends = document.getElementById("trendSwitch").checked;
+  const trend_category = useTrends ? selectedCategory : null;
+  const trend_source_preference = useTrends ? (document.getElementById("trendSourcePreference")?.value || "reddit_first") : "reddit_first";
+  const te = document.getElementById("scriptEditor");
+  if (pendingScript) {
+    const s = { ...pendingScript, voiceover_text: (te && te.value.trim()) || pendingScript.voiceover_text };
+    return {
+      topic: draftTopic || document.getElementById("autoTopic").value.trim() || null,
+      voice_id: document.getElementById("autoVoice").value,
+      use_trends: false, script: s, trend_category, trend_source_preference,
+      duration_seconds: autoDurationSeconds, ...tts,
+    };
+  }
+  return {
+    topic: document.getElementById("autoTopic").value.trim() || null,
+    voice_id: document.getElementById("autoVoice").value,
+    use_trends: useTrends, trend_category, trend_source_preference,
+    duration_seconds: autoDurationSeconds, ...tts,
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STEP LABELS
+══════════════════════════════════════════════════════════════════ */
+const STEPS_AUTO = [
+  { id: 'step-script',    label: 'Senaryo olusturuluyor…',       pct: 10, text: 'Senaryo olusturma' },
+  { id: 'step-voice',     label: 'Seslendirme yapiliyor…',       pct: 35, text: 'Seslendirme' },
+  { id: 'step-images',    label: 'Gorseller olusturuluyor…',     pct: 58, text: 'Gorsel olusturma' },
+  { id: 'step-subtitles', label: 'Altyazi isleniyor…',           pct: 78, text: 'Altyazi isleme' },
+  { id: 'step-compose',   label: 'Final video birlestiriliyor…', pct: 93, text: 'Video birlestirme' },
+];
+const STEPS_SEMI = [
+  { id: 'step-script',    label: 'Video yukleniyor…',               pct: 12, text: 'Video yukleme' },
+  { id: 'step-voice',     label: 'TTS ses uretiliyor…',             pct: 35, text: 'TTS seslendirme' },
+  { id: 'step-images',    label: 'Stok klipler kontrol ediliyor…',  pct: 58, text: 'Klip hazirlama' },
+  { id: 'step-subtitles', label: 'Altyazi isleniyor…',              pct: 78, text: 'Altyazi isleme' },
+  { id: 'step-compose',   label: 'Final video birlestiriliyor…',    pct: 93, text: 'Video birlestirme' },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   GENERATE (Auto / Manual)
+══════════════════════════════════════════════════════════════════ */
+async function requestGenerate(mode) {
+  const payload = collectGeneratePayload(mode);
+  const response = await apiFetch('/api/generate', {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
+  return data;
+}
+
+async function startGenerate(mode) {
+  if (running) return;
+  if (mode === "auto" && !pendingScript) {
+    alert("Otomatik modda once '1. Metin Olustur' ile taslak alin, metni duzenleyin, sonra '2. Videoyu Uret' tiklayin.");
+    return;
+  }
+  running = true;
+  const btn = mode === 'auto' ? document.getElementById('autoGenBtn') : document.getElementById('manualGenBtn');
+  _resetGenerateUI(btn, STEPS_AUTO);
+  await _animateSteps(STEPS_AUTO);
+  try {
+    if (mode === "manual") {
+      const input = document.getElementById('videoFile');
+      if (input && input.files && input.files.length) {
+        setProgress(4, 'Videolar yukleniyor…');
+        manualUploadedFileIds = await uploadVideos('videoFile');
+      } else { manualUploadedFileIds = []; }
+    }
+    setProgress(95, 'Sunucu video uretiyor…');
+    document.getElementById('loadingMsg').textContent = 'Gercek video uretimi suruyor…';
+    document.getElementById('loadingOverlay').classList.add('visible');
+    await requestGenerate(mode);
+  } catch (err) {
+    _failGenerateUI(btn, `<span>✨</span> ${mode === 'auto' ? '2. Videoyu Uret' : 'Video Uret'}`, err.message);
+    return;
+  }
+  await _finishGenerateUI(btn, `<span>♻️</span> Yeniden Uret`);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SEMI-AUTO GENERATE
+══════════════════════════════════════════════════════════════════ */
+async function startSemiAutoGenerate() {
+  if (running) return;
+  const videoInput = document.getElementById('semiVideoFile');
+  const voiceoverText = document.getElementById('semiVoiceoverText').value.trim();
+  if (!videoInput.files || !videoInput.files.length) {
+    alert('Lutfen bir video dosyasi secin (Ana Video alani zorunludur).'); return;
+  }
+  if (!voiceoverText) {
+    alert('Lutfen seslendirme metnini girin (Seslendirme Metni alani zorunludur).'); return;
+  }
+  running = true;
+  const btn = document.getElementById('semiGenBtn');
+  _resetGenerateUI(btn, STEPS_SEMI);
+  try {
+    setStep('step-script', 'busy');
+    setProgress(5, 'Video sunucuya yukleniyor…');
+    document.getElementById('loadingMsg').textContent = 'Video yukleniyor…';
+    const fileIds = await uploadVideos('semiVideoFile');
+    semiUploadedFileId = fileIds[0] || null; semiUploadedFileIds = fileIds;
+    setStep('step-script', 'done');
+    await animateTo(5, 20, 'Video yuklendi', 400);
+    await _animateSteps(STEPS_SEMI.slice(1), 20);
+    const scenes = document.getElementById('semiScenes').value.trim() || null;
+    const voice_id = document.getElementById('semiVoice').value;
+    const topic = document.getElementById('semiTopic').value.trim() || null;
+    const tts = collectTtsSettings();
+    setProgress(95, 'Sunucu video uretiyor…');
+    document.getElementById('loadingMsg').textContent = 'TTS ve video uretimi suruyor…';
+    document.getElementById('loadingOverlay').classList.add('visible');
+    const res = await apiFetch('/api/semi-auto', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_ids: semiUploadedFileIds, voiceover_text: voiceoverText, scenes, voice_id, topic, ...tts }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  } catch (err) {
+    _failGenerateUI(btn, `<span>🎬</span> Videoyu Uret`, err.message); return;
+  }
+  await _finishGenerateUI(btn, `<span>♻️</span> Yeniden Uret`);
+}
+
+async function startRevoice() {
+  if (running) return;
+  const text = document.getElementById('revoiceText').value.trim()
+    || (document.getElementById('scriptEditor')?.value || '').trim();
+  if (!text) { alert('Yeniden seslendirme icin metin gerekli.'); return; }
+  const btn = document.getElementById('revoiceBtn');
+  running = true; btn.disabled = true; btn.classList.add('running');
+  btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;border-width:2px;display:inline-block"></span> Uygulaniyor…';
+  try {
+    const tts = collectTtsSettings();
+    const voice_id = getVoiceSelect(currentMode === 'semiAuto' ? 'semi' : currentMode)?.value || null;
+    const refresh_subtitles = !!document.getElementById('revoiceRefreshSubtitles')?.checked;
+    const res = await apiFetch('/api/revoice', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice_id, refresh_subtitles, ...tts }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    await attachFinalVideoPreview();
+  } catch (e) {
+    alert('Hizli yeniden seslendirme basarisiz: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.classList.remove('running');
+    btn.innerHTML = '<span>🔁</span> Hizli Yeniden Seslendir'; running = false;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SHARED GENERATE UI HELPERS
+══════════════════════════════════════════════════════════════════ */
+function _resetGenerateUI(btn, steps) {
+  btn.disabled = true; btn.classList.add('running');
+  btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;border-width:2px;display:inline-block"></span> Uretiliyor…';
+  document.getElementById('successBanner').classList.remove('visible');
+  document.getElementById('dlBtn').disabled = true;
+  resetPreviewVideo();
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('stepsList').style.display = 'flex';
+  steps.forEach(s => {
+    const el = document.getElementById(s.id);
+    if (el) { const lbl = el.querySelector('.step-label-text'); if (lbl) lbl.textContent = s.text; }
+  });
+  document.getElementById('statusDot').className = 'dot busy';
+  document.getElementById('statusLabel').textContent = 'Uretiliyor';
+  document.getElementById('loadingOverlay').classList.add('visible');
+  steps.forEach(s => setStep(s.id, ''));
+  setProgress(0, 'Baslatiliyor…');
+}
+
+async function _animateSteps(steps, startPct = 0) {
+  let prev = startPct;
+  for (const s of steps) {
+    setStep(s.id, 'busy');
+    document.getElementById('loadingMsg').textContent = s.label;
+    document.getElementById('loadingOverlay').classList.add('visible');
+    await animateTo(prev, s.pct, s.label, 900 + Math.random() * 600);
+    setStep(s.id, 'done'); prev = s.pct;
+  }
+}
+
+function _startGenerateUI(btn, steps) { _resetGenerateUI(btn, steps); }
+
+function _failGenerateUI(btn, resetHtml, errMsg) {
+  document.getElementById('loadingOverlay').classList.remove('visible');
+  showVideoLoadError(`Uretim basarisiz: ${errMsg}`);
+  btn.disabled = false; btn.classList.remove('running'); btn.innerHTML = resetHtml; running = false;
+}
+
+async function _finishGenerateUI(btn, resetHtml) {
+  await animateTo(95, 100, 'Tamamlaniyor…', 500);
+  document.getElementById('loadingMsg').textContent = 'Video dosyasi yukleniyor…';
+  document.getElementById('loadingOverlay').classList.add('visible');
+  document.getElementById('statusLabel').textContent = 'Onizleme';
+  document.getElementById('statusDot').className = 'dot busy';
+  setProgress(100, 'Onizleme hazirlaniyor…');
+  await attachFinalVideoPreview();
+  btn.disabled = false; btn.classList.remove('running'); btn.innerHTML = resetHtml; running = false;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PROGRESS / STEPS
+══════════════════════════════════════════════════════════════════ */
+function setProgress(pct, label) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
+
+function setStep(stepId, state) {
+  const el = document.getElementById(stepId);
+  if (!el) return;
+  el.classList.remove('done', 'busy');
+  if (state) el.classList.add(state);
+}
+
+function animateTo(from, to, label, duration) {
+  return new Promise(resolve => {
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      const v = Math.round(from + (to - from) * ease);
+      setProgress(v, label);
+      if (t < 1) requestAnimationFrame(tick);
+      else resolve();
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO PREVIEW (Otomasyon)
+══════════════════════════════════════════════════════════════════ */
+function getFinalVideoUrl() {
+  return new URL("assets/output/final_video.mp4", window.location.href).href;
+}
+
+function resetPreviewVideo() {
+  const vp = document.getElementById("videoPlayer");
+  vp.pause(); vp.removeAttribute("src"); vp.load(); vp.style.display = "none";
+  document.getElementById("subtitlePreview").style.display = "";
+}
+
+function showVideoLoadError(message) {
+  document.getElementById("loadingOverlay").classList.remove("visible");
+  resetPreviewVideo();
+  const empty = document.getElementById("emptyState");
+  empty.style.display = "flex";
+  empty.querySelector(".big-icon").textContent = "⚠";
+  empty.querySelector("p").textContent = message || "final_video.mp4 bulunamadi. Once video uretin, sonra yeniden dene.";
+  document.getElementById("dlBtn").disabled = true;
+  document.getElementById("statusDot").className = "dot";
+  document.getElementById("statusLabel").textContent = "";
+}
+
+function attachFinalVideoPreview() {
+  return new Promise(resolve => {
+    const vp = document.getElementById("videoPlayer");
+    const sub = document.getElementById("subtitlePreview");
+    const empty = document.getElementById("emptyState");
+    const url = getFinalVideoUrl() + "?t=" + Date.now();
+    const finish = ok => { vp.onerror = null; vp.onloadeddata = null; resolve(ok); };
+    vp.onerror = () => {
+      showVideoLoadError("Onizleme yuklenemedi. assets/output/final_video.mp4 dosyasi yok veya sunucu erisimi kapali.");
+      finish(false);
+    };
+    vp.onloadeddata = () => {
+      document.getElementById("loadingOverlay").classList.remove("visible");
+      empty.style.display = "none"; vp.style.display = "block"; sub.style.display = "none";
+      document.getElementById("dlBtn").disabled = false;
+      document.getElementById("statusDot").className = "dot done";
+      document.getElementById("statusLabel").textContent = "Hazir";
+      document.getElementById("successBanner").classList.add("visible");
+      setProgress(100, "Tamamlandi");
+      try { vp.play().catch(() => {}); } catch (_) {}
+      finish(true);
+    };
+    vp.src = url; vp.load();
+  });
+}
+
+async function downloadFinalVideo() {
+  const vp = document.getElementById("videoPlayer");
+  const src = vp.currentSrc || vp.src;
+  if (!src) { alert("Once video uretimini tamamlayin."); return; }
+  const cleanUrl = src.split("?")[0];
+  try {
+    const response = await fetch(cleanUrl + "?t=" + Date.now());
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl; anchor.download = "final_video.mp4"; anchor.rel = "noopener";
+    document.body.appendChild(anchor); anchor.click(); anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
+  } catch (_) { alert("Indirme basarisiz. Dosya yolu: assets/output/final_video.mp4"); }
+}
+
+document.getElementById("dlBtn").addEventListener("click", downloadFinalVideo);
+
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO KESİTİ — URL + IFRAME
+══════════════════════════════════════════════════════════════════ */
+function extractYtId(url) {
+  const patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/v\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
+function onClipUrlChange(url) {
+  const vid = extractYtId(url || '');
+  const iframe = document.getElementById('ytPreviewIframe');
+  const empty = document.getElementById('ytPreviewEmpty');
+  const errEl = document.getElementById('clipUrlError');
+  const field = document.getElementById('clipUrlField');
+  const dot = document.getElementById('ytPreviewDot');
+
+  if (vid) {
+    iframe.src = `https://www.youtube-nocookie.com/embed/${vid}`;
+    iframe.style.display = 'block';
+    empty.style.display = 'none';
+    errEl.classList.remove('visible');
+    field.classList.remove('has-error');
+    dot.className = 'dot active';
+  } else {
+    iframe.src = 'about:blank';
+    iframe.style.display = 'none';
+    empty.style.display = 'flex';
+    dot.className = 'dot';
+    if (url && url.length > 10) {
+      errEl.classList.add('visible');
+      field.classList.add('has-error');
+    } else {
+      errEl.classList.remove('visible');
+      field.classList.remove('has-error');
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO KESİTİ — TIME INPUT MASK
+══════════════════════════════════════════════════════════════════ */
+function maskTimeInput(input) {
+  const prev = input.value;
+  let raw = prev.replace(/\D/g, '');
+  if (raw.length > 6) raw = raw.slice(0, 6);
+  let masked = '';
+  if (raw.length >= 1) masked += raw.slice(0, Math.min(2, raw.length));
+  if (raw.length > 2)  masked += ':' + raw.slice(2, Math.min(4, raw.length));
+  if (raw.length > 4)  masked += ':' + raw.slice(4, 6);
+  if (input.value !== masked) input.value = masked;
+}
+
+function parseHHMMSS(val) {
+  const m = val.match(/^(\d{2}):(\d{2}):(\d{2})$/);
+  if (!m) return null;
+  return parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseInt(m[3]);
+}
+
+function validHHMMSS(val) {
+  const m = val.match(/^(\d{2}):(\d{2}):(\d{2})$/);
+  if (!m) return false;
+  return parseInt(m[2]) < 60 && parseInt(m[3]) < 60;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO KESİTİ — FORM VALIDATION
+══════════════════════════════════════════════════════════════════ */
+function validateClipForm() {
+  let ok = true;
+  const url   = document.getElementById('clipUrl').value.trim();
+  const start = document.getElementById('clipStart').value.trim();
+  const end   = document.getElementById('clipEnd').value.trim();
+
+  function showErr(id, fieldId, msg) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.classList.add('visible'); }
+    if (fieldId) document.getElementById(fieldId)?.classList.add('has-error');
+    ok = false;
+  }
+  function clearErr(id, fieldId) {
+    document.getElementById(id)?.classList.remove('visible');
+    if (fieldId) document.getElementById(fieldId)?.classList.remove('has-error');
+  }
+
+  if (!extractYtId(url)) {
+    showErr('clipUrlError', 'clipUrlField', 'Geçerli bir YouTube URL girin');
+  } else { clearErr('clipUrlError', 'clipUrlField'); }
+
+  if (!validHHMMSS(start)) {
+    showErr('clipStartError', 'clipStartField', 'HH:MM:SS formatında girin (ör. 00:01:30)');
+  } else { clearErr('clipStartError', 'clipStartField'); }
+
+  if (!validHHMMSS(end)) {
+    showErr('clipEndError', 'clipEndField', 'HH:MM:SS formatında girin (ör. 00:02:00)');
+  } else { clearErr('clipEndError', 'clipEndField'); }
+
+  if (validHHMMSS(start) && validHHMMSS(end)) {
+    const s = parseHHMMSS(start), e = parseHHMMSS(end);
+    if (s >= e) {
+      showErr('clipStartError', 'clipStartField', 'Başlangıç zamanı bitiş zamanından önce olmalı');
+    }
+  }
+  return ok;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO KESİTİ — JOB SUBMIT & POLL
+══════════════════════════════════════════════════════════════════ */
+let _clipPolling = false;
+
+async function submitClipJob() {
+  if (!validateClipForm()) return;
+
+  const url      = document.getElementById('clipUrl').value.trim();
+  const start    = document.getElementById('clipStart').value.trim();
+  const end      = document.getElementById('clipEnd').value.trim();
+  const filename = document.getElementById('clipFilename').value.trim() || 'clip';
+
+  const btn = document.getElementById('clipSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-ring" style="width:16px;height:16px;border-width:2px;display:inline-block;margin-right:8px"></span>İşleniyor…';
+
+  document.getElementById('clipProgressWrap').classList.add('visible');
+  document.getElementById('clipResult').classList.remove('visible');
+  document.getElementById('clipError').classList.remove('visible');
+  setClipProgress(5, 'İş kuyruğa alınıyor…');
+
+  try {
+    const res = await apiFetch('/api/download_clip', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, start_time: start, end_time: end, filename }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    setClipProgress(10, 'Bağlantı kuruldu, işlem başlıyor…');
+    await pollClipJob(data.job_id);
+  } catch (err) {
+    _showClipError(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✂️ Klibi Kes ve İndir';
+  }
+}
+
+async function pollClipJob(jobId) {
+  _clipPolling = true;
+  let lastPct = 10;
+
+  while (_clipPolling) {
+    try {
+      const res = await apiFetch(`/api/jobs/${jobId}`);
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+      const pct = Math.max(lastPct, data.progress || 0);
+      lastPct = pct;
+      setClipProgress(pct, data.message || '');
+
+      if (data.status === 'done') {
+        setClipProgress(100, 'Tamamlandı!');
+        _showClipResult(data);
+        _clipPolling = false;
+        return;
+      } else if (data.status === 'error') {
+        throw new Error(data.message || 'İşlem başarısız oldu');
+      }
+    } catch (err) {
+      _showClipError(err.message);
+      _clipPolling = false;
+      return;
+    }
+
+    await new Promise(r => setTimeout(r, 1500));
+  }
+}
+
+function setClipProgress(pct, label) {
+  const fill  = document.getElementById('clipProgressFill');
+  const lbl   = document.getElementById('clipProgressLabel');
+  const pctEl = document.getElementById('clipProgressPct');
+  if (fill)  fill.style.width = pct + '%';
+  if (lbl)   lbl.textContent = label;
+  if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+}
+
+function _showClipResult(data) {
+  document.getElementById('clipProgressWrap').classList.remove('visible');
+  const result = document.getElementById('clipResult');
+  result.classList.add('visible');
+
+  const dlLink = document.getElementById('clipDownloadLink');
+  if (dlLink && data.download_url) {
+    dlLink.href = API_BASE + data.download_url;
+    const fname = (data.clip_path || '').split('/').pop() || 'clip.mp4';
+    dlLink.setAttribute('download', fname);
+    dlLink.textContent = '⬇️ Klibi İndir — ' + fname;
+  }
+
+  if (window.gsap) {
+    gsap.fromTo(result, { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.5)' });
+  }
+}
+
+function _showClipError(msg) {
+  document.getElementById('clipProgressWrap').classList.remove('visible');
+  const errWrap = document.getElementById('clipError');
+  errWrap.classList.add('visible');
+  document.getElementById('clipErrorMsg').textContent = msg || 'Bilinmeyen hata';
+
+  if (window.gsap) {
+    gsap.fromTo(errWrap, { x: -8 }, { x: 0, duration: 0.4, ease: 'elastic.out(1, 0.4)' });
+  }
+}
+
+function resetClipUI() {
+  _clipPolling = false;
+  document.getElementById('clipError').classList.remove('visible');
+  document.getElementById('clipResult').classList.remove('visible');
+  document.getElementById('clipProgressWrap').classList.remove('visible');
+  const btn = document.getElementById('clipSubmitBtn');
+  btn.disabled = false;
+  btn.innerHTML = '✂️ Klibi Kes ve İndir';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════════ */
+selectDuration('auto', 45);
+</script>
+</body>
+</html>
